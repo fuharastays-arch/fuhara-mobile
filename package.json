@@ -1,0 +1,26 @@
+{
+  "name": "fuhara-product",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @fuhara/web",
+    "build": "npm run build --workspace @fuhara/web",
+    "start": "npm run start --workspace @fuhara/web",
+    "typecheck": "npm run typecheck --workspace @fuhara/web",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "test:smoke": "node --test tests/smoke.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
+  }
+}

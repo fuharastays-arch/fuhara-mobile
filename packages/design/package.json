@@ -1,0 +1,9 @@
+{
+  "name": "@fuhara/design",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    "./tokens.css": "./tokens.css",
+    ".": "./tokens.ts"
+  }
+}

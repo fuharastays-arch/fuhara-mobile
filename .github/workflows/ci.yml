@@ -1,0 +1,30 @@
+name: Product foundation
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_test_fixture
+      NEXT_PUBLIC_APP_URL: http://localhost:3001
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm test
+      - run: npm run typecheck
+      - run: npm run build
+      - name: Route smoke tests (no real provider credentials)
+        run: |
+          npm start > /tmp/fuhara-preview.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://localhost:3001/ >/dev/null; then break; fi
+            sleep 1
+          done
+          npm run test:smoke
