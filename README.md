@@ -1,4 +1,4 @@
-# Fuhara product foundation
+# Fuhara guest/host product — Phase 2
 
 **Verified stays. Effortless comfort.**
 
@@ -54,15 +54,26 @@ No Supabase Auth settings were changed in this task. No real user was created, e
 
 ## Backend boundaries
 
-Live public listings and booking reads are not authorized by inspected existing policies. Discovery therefore displays a coming-soon state and property details return 404. Host onboarding shows genuine existing profile/KYC progress but cannot submit an application. This is deliberate Phase 1 scope, not a finished marketplace.
+Discovery and property detail now use the anonymous `product_catalog_v1` RPC: approved stays from active, verified hosts, NGN nightly rates, real cover/gallery images and amenities. Search supports city/area, capacity, stay type, maximum nightly price, sorting and pagination. Missing/failed backend access is distinct from an empty result. No fake inventory is supplied to the app.
+
+The candidate migration has **not been applied**. Until it is deployed and reachable, the normal local preview displays catalog unavailable. The test suite uses an isolated loopback fixture API to exercise populated pages; it never seeds the shared Supabase database.
+
+Date selection provides an integer-kobo nightly subtotal only. Availability is unconfirmed; booking/payment controls remain disabled. No bookings, finance, account or Admin behavior was changed. Host onboarding still reflects existing KYC progress without a new submission workflow.
 
 - [Data-contract map](docs/DATA-CONTRACTS.md)
+- [Final Phase 2 backend contract](docs/PHASE-2-CONTRACT.md)
 - [Migration proposals — none applied](docs/MIGRATION-PROPOSALS.md)
 - [Architecture and mobile path](docs/ARCHITECTURE.md)
 - [Verification report](docs/VERIFICATION.md)
 
 ## Next milestone
 
-Review a current schema export, approve and test a narrow public catalog contract, then build real property cards/details, search/filter/pagination and verified-host publication gating. In parallel with that milestone, validate this auth/profile flow on staging with guest, verified host and suspended-account fixtures. Add host application submission only after its separate privileged workflow is reviewed.
+First rehearse the catalog migration and Admin regression matrix in staging, then enable real discovery. The next product milestone is authoritative availability, server-priced quotes and idempotent booking requests with overlap protection. Validate the auth/profile flow in staging with guest, verified-host and suspended-account fixtures. Host application submission remains a separate workflow.
+
+## Phase 2 tests
+
+`npm run test:catalog-routes` builds an isolated production test app on port 3012 and starts a mock RPC server on 127.0.0.1:4011. It checks real routes against successful, empty, failed and malformed API responses. The fixture is clearly labelled TEST FIXTURE and is never used in normal development or production. Both servers are stopped afterward. Set PLAYWRIGHT_MODULE to an installed Playwright module URL and optionally CHROME_PATH to include browser interaction and desktop/mobile checks; otherwise only HTTP checks run. Browser screenshots are test evidence, not live inventory.
+
+SQL role tests: `psql -v ON_ERROR_STOP=1 -d fuhara_catalog_test -f tests/sql/catalog.sql` against an empty disposable database only. A database-name guard prevents accidental use elsewhere. The CI workflow supplies PostgreSQL 17. No PostgreSQL runtime is bundled in the app.
 
 Before public launch: complete those integration checks, review shared Supabase SMTP/redirect/CAPTCHA settings, confirm brand asset rights, and supply privacy/terms content. A future deployment must use a new hosting project, never the Admin project.

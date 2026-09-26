@@ -1,27 +1,29 @@
-# Proposed backend work — NOT APPLIED
+# Backend changes — prepared, NOT APPLIED
 
-No SQL migrations are executed or assigned migration numbers in this repository. Coordinate numbering with the Admin repository after its 018 migration. Review against a current schema export and test on a staging branch before considering production. Preserve all existing staff policies, Auth Site URL, email templates and admin redirect URLs.
+## Final Phase 2 decision
 
-## 1. Public catalog (needed for live discovery)
+Read [PHASE-2-CONTRACT.md](PHASE-2-CONTRACT.md) first. The implementation contains one additive candidate: `supabase/migrations/019_product_catalog.sql`. Number 019 follows the reported Admin 018 rollout, but must be reconciled with the current shared migration history before deployment.
 
-Design a narrowly scoped catalog endpoint/RPC in a dedicated exposed product schema, returning only the PropertySummary allowlist from DATA-CONTRACTS.md. Read approved properties only, additionally requiring an active host account and verified host profile. Do not expose street addresses, owner IDs, staff review metadata or rejection reasons. A proposed security-definer RPC must use a fixed empty search_path, fully qualified names, no caller-controlled SQL, bounded pagination and explicit execute grants for anon/authenticated. Review these semantics before implementing it. Avoid broadly granting public SELECT on properties or changing staff policies to make a UI work.
+It creates only property_images, property_amenities, their staff-only RLS policies and the public.product_catalog_v1 read RPC. It does not alter existing profiles, user_accounts, host_profiles, properties, bookings, finance tables, staff policies, triggers, Auth configuration or storage policies. No production or staging migration was applied. No staging environment was identified.
 
-Acceptance: anonymous and ordinary guest see only eligible published projections; suspended/rejected/pending properties and inactive/unverified hosts are excluded; cross-host IDs and sensitive fields never appear; sorting/search are bounded and deterministic; staff dashboard sees exactly what it did before. Add indexes only after query planning.
+The Phase 1 proposal for a dedicated exposed product schema is replaced by a versioned public RPC: it avoids a separate API schema configuration change while maintaining the same narrow allowlist. The web never selects the private properties table or forwards a staff session to the RPC.
 
-## 2. Host applications (needed for submission, not the current shell)
+## Exactly what must be applied
 
-Propose a separate host_applications table rather than overloading privileged host_profiles. Confirm required business/KYC inputs, retention and storage policy first. Applicant owns a draft/application; they must never write reviewed_by, verification result or user_accounts.is_host. Approved staff workflow can create host_profiles and change host capability transactionally with audit events. Keep identity documents in private storage with tightly scoped upload/download rules. No document upload exists in this foundation.
+1. Obtain a current **read-only schema export** and migration history from the shared Supabase project. Verify baseline columns/types, `private.has_staff_permission(text)`, publication status values, table ownership, existing grants and RLS. Run `supabase/preflight.sql` read-only to help review. Confirm candidate 019 is unused; renumber consistently if necessary.
+2. Use a disposable PostgreSQL database to run `tests/sql/catalog.sql` with `psql -v ON_ERROR_STOP=1 -d fuhara_catalog_test -f tests/sql/catalog.sql`. CI includes a PostgreSQL 17 service for this. These tests use the original Admin 006 migration plus minimal dependency fixtures; they do not prove compatibility with every live policy. This environment could not run them: PostgreSQL/Docker are absent and downloading an embedded engine was denied.
+3. Create/identify a safe Supabase staging branch from the current schema. Apply **only** the reviewed `019_product_catalog.sql` to staging using the normal shared migration process, as the trusted migration owner (normally postgres). Do not use a product/guest role. Do not run the fixture SQL against staging with real data.
+4. Verify anon/guest/owner/staff catalog behavior in staging, including pending/rejected/suspended properties; disabled/suspended accounts; unverified hosts; media writes; direct table denial; ordering, filters and pagination. Revoke approval or host eligibility and ensure catalog/detail immediately disappear. Confirm PostgREST RPC discovery after schema reload. Run EXPLAIN for representative inventory size.
+5. Run existing Admin property review, host/KYC, bookings, profile and staff regression checks against staging. Ensure staff edits and audit events are unchanged. Inspect public description/media content, since approval authorizes publication of those fields.
+6. After staging passes and production deployment is authorized, apply the **same migration** once to production. No seeds, data replacements, backfills, Auth settings, storage bucket policies or service keys are required. Existing cover_image_url values work immediately for eligible rows; supplemental images and amenities appear only when authorized staff ingest real content.
+7. Configure/build the separate product with its publishable/anon Supabase values and verify the live catalog. Leave the Admin hosting project untouched. Until then, the normal preview honestly shows catalog unavailable if the RPC cannot be reached.
 
-Acceptance: active users can access only their application; suspended users cannot submit; submission is idempotent; only authorized staff approve/reject; applicants cannot self-verify or self-promote; existing Admin host views and audit triggers continue working.
+## Rollback / disable
 
-## 3. Consumer account hardening (recommended before public launch)
+First roll the product app back to Phase 1 or disable its catalog entry points. Revoke EXECUTE on `public.product_catalog_v1(text,integer,text,bigint,text,integer,uuid)` from anon and authenticated and notify PostgREST to reload its schema. Keep the new tables and their content for investigation; no destructive drop is needed to stop publication. Existing Admin operations are unaffected by this additive rollback. Any later table removal requires a separate data-retention review.
 
-Existing profile UPDATE RLS only checks ownership, not active account status. This app blocks non-active updates, but direct clients can still call the Data API under current policies. Review a database-level active-account predicate while preserving legitimate initial setup and staff access. Also review verified Auth email binding and an idempotent transaction for profile + initial account creation. Do not replace existing policies without a compatibility test matrix.
+## Deferred contracts
 
-## 4. Guest bookings (later booking milestone)
-
-Design an own-booking read projection using guest_id = auth.uid(), excluding admin_note and staff-only financial/review fields. Creation must be a controlled transactional service/RPC with current prices, availability locking, idempotency, financial snapshots and payment state. No client-priced direct inserts. Do not equate RLS-hidden rows with an empty trip list.
-
-## Release process
-
-Export production schema read-only → compare with source migrations → test proposed changes in staging → run anon/guest/host/staff role matrix and Admin regression suite → review forward and rollback plans → obtain approval to apply. Enable live product features only after the corresponding contract is deployed and verified. None of these proposals is necessary to run the current shell and existing-profile auth flow locally.
+- Host applications: separate applicant-owned drafts and a staff-controlled approval workflow; no self-verification or is_host mutation. Identity documents require private storage and retention rules.
+- Consumer hardening: existing profile UPDATE RLS checks ownership, not active-account status. App checks remain in place; database hardening needs a separate compatibility matrix, verified-email binding and recoverable initial setup.
+- Availability/booking: own-guest projections excluding admin notes; property-local dates; blocked nights; authoritative quotes; overlap locking; idempotency; payment and finance snapshots. No client-priced direct booking inserts. No booking/availability migration is included in Phase 2 discovery.

@@ -94,8 +94,7 @@ export default function Home() {
           </Link>
         </div>
         <p className="caption">
-          Destination inspiration · Our first collection of stays is coming
-          soon.
+          Destination inspiration · Explore the collection for current stays.
         </p>
       </section>
       <section className="promise section">

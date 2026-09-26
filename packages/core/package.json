@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./profile-workflow": "./src/profile-workflow.ts"
+    "./profile-workflow": "./src/profile-workflow.ts",
+    "./catalog": "./src/catalog.ts"
   }
 }

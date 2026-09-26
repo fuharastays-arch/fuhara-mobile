@@ -1,5 +1,6 @@
 node_modules/
 .next/
+.next-catalog-test/
 .env*
 !.env.example
 *.tsbuildinfo

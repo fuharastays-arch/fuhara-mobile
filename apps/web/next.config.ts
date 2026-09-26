@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next';
 const config: NextConfig = {
+  distDir: process.env.FUHARA_BUILD_DIR || '.next',
   transpilePackages: ['@fuhara/core', '@fuhara/design'],
   poweredByHeader: false,
   async headers() {

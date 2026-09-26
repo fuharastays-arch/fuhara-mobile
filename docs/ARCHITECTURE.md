@@ -10,22 +10,24 @@ The proxy refreshes sessions on account/host/auth paths and emits private no-sto
 
 ## Routes
 
-| Route                                       | Purpose                                                               |
-| ------------------------------------------- | --------------------------------------------------------------------- |
-| /                                           | Editorial hospitality home, destination discovery entry               |
-| /properties?destination=                    | Searchable destination shell with honest unavailable state            |
-| /properties/[id]                            | UUID detail route boundary; 404 until approved public contract exists |
-| /host                                       | Public hosting introduction                                           |
-| /host/onboarding                            | Authenticated profile/verification progress shell                     |
-| /account                                    | Authenticated account overview                                        |
-| /account/profile                            | Self profile completion/editing and initial non-host account creation |
-| /auth/sign-in, /auth/sign-up                | Shared guest/host identity                                            |
-| /auth/forgot-password, /auth/reset-password | Recovery request and authenticated password update                    |
-| /auth/callback                              | PKCE code exchange, allowlisted redirect                              |
+| Route                                       | Purpose                                                                     |
+| ------------------------------------------- | --------------------------------------------------------------------------- |
+| /                                           | Editorial hospitality home, destination discovery entry                     |
+| /properties?destination=                    | Real RPC catalog; location/capacity/type/price filters, sorting, pagination |
+| /properties/[id]                            | Eligible property, gallery, amenities and nightly estimate; missing ID 404  |
+| /host                                       | Public hosting introduction                                                 |
+| /host/onboarding                            | Authenticated profile/verification progress shell                           |
+| /account                                    | Authenticated account overview                                              |
+| /account/profile                            | Self profile completion/editing and initial non-host account creation       |
+| /auth/sign-in, /auth/sign-up                | Shared guest/host identity                                                  |
+| /auth/forgot-password, /auth/reset-password | Recovery request and authenticated password update                          |
+| /auth/callback                              | PKCE code exchange, allowlisted redirect                                    |
 
 Email signup does not write a guest/host role into auth metadata. Confirm email then complete profile. Existing hosts sign in normally; hosting eligibility requires active user_accounts, is_host=true and verified host_profiles. Onboarding does not submit an application yet.
 
 ## Mobile path
+
+Phase 2 adds `packages/core/catalog` for validated public projections, filters, exact money formatting and date/subtotal rules. `apps/web/src/lib/catalog.ts` calls the anonymous versioned RPC with no session forwarding, no caching and a bounded timeout. The browse route owns its loading boundary so detail 404 responses are not prematurely streamed as 200. The stay planner never creates bookings or claims availability.
 
 Use the same Supabase project and RLS with a native secure-storage auth adapter. Keep API contracts independent from Next Server Actions. Future catalog/booking contracts should be reusable RPCs or versioned service interfaces. Add mobile deep links to the existing Auth allowlist only after mobile development begins. Do not copy browser cookie handling into native code.
 

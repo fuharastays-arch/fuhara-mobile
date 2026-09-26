@@ -29,10 +29,8 @@ for (const path of [
     assert.match(response.headers.get('cache-control'), /no-store/);
   });
 }
-test('catalog detail remains closed without a public data contract', async () => {
-  const response = await fetch(
-    new URL('/properties/c3b2fd12-ceda-4f5e-8c83-1f72f5041523', base),
-  );
+test('malformed catalog detail returns not found', async () => {
+  const response = await fetch(new URL('/properties/not-a-property-id', base));
   assert.equal(response.status, 404);
 });
 test('unrecognized auth actions are not routed to a form', async () => {

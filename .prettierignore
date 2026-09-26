@@ -1,5 +1,6 @@
 node_modules
 .next
+.next-catalog-test
 .npm-cache
 package-lock.json
 next-env.d.ts
