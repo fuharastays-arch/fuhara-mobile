@@ -1,3 +1,5 @@
+> Current rollout status: see [Phase 2 production closeout](PHASE-2-RELEASE.md). The pre-rollout status statements below are historical.
+
 # Phase 2 verification and handoff
 
 Validated on 26 September 2026, Windows, Node 24.19.0. Based on Phase 1 commit `37bb5d1` in a separate local product repository. Admin source and production database were not modified.

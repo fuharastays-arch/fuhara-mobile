@@ -1,3 +1,5 @@
+> Current rollout status: see [Phase 2 production closeout](PHASE-2-RELEASE.md). The pre-rollout status statements below are historical.
+
 # Phase 2 backend contract — finalized for implementation, not deployed
 
 Baseline: product commit `37bb5d1`, DATA-CONTRACTS.md and MIGRATION-PROPOSALS.md; Admin source migrations 003, 005, 006, 007, 016 and 017. Production has not been introspected and no staging environment is identified. Deployment requires the preflight and staging checks in MIGRATION-PROPOSALS.md.

@@ -1,3 +1,5 @@
+> Current rollout status: see [Phase 2 production closeout](PHASE-2-RELEASE.md). The pre-rollout status statements below are historical.
+
 # Backend changes — prepared, NOT APPLIED
 
 ## Final Phase 2 decision

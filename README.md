@@ -56,7 +56,7 @@ No Supabase Auth settings were changed in this task. No real user was created, e
 
 Discovery and property detail now use the anonymous `product_catalog_v1` RPC: approved stays from active, verified hosts, NGN nightly rates, real cover/gallery images and amenities. Search supports city/area, capacity, stay type, maximum nightly price, sorting and pagination. Missing/failed backend access is distinct from an empty result. No fake inventory is supplied to the app.
 
-The candidate migration has **not been applied**. Until it is deployed and reachable, the normal local preview displays catalog unavailable. The test suite uses an isolated loopback fixture API to exercise populated pages; it never seeds the shared Supabase database.
+Migration 019 was applied to production on 26 September 2026 after matching the staging-tested bytes. See [Phase 2 release evidence and remaining launch checks](docs/PHASE-2-RELEASE.md). The guest/host app is not publicly deployed. Integration tests use an isolated loopback fixture and never seed the shared Supabase database.
 
 Date selection provides an integer-kobo nightly subtotal only. Availability is unconfirmed; booking/payment controls remain disabled. No bookings, finance, account or Admin behavior was changed. Host onboarding still reflects existing KYC progress without a new submission workflow.
 

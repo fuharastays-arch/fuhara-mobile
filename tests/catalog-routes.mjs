@@ -58,6 +58,30 @@ try {
   }
   assert.ok(ready, 'Test app did not start');
   await check(
+    'full route smoke suite on the matching callback origin',
+    async () => {
+      const smoke = spawn(process.execPath, ['--test', 'tests/smoke.mjs'], {
+        cwd: root,
+        env: { ...env, TEST_BASE_URL: 'http://localhost:3012' },
+        stdio: 'inherit',
+      });
+      const [code] = await once(smoke, 'exit');
+      assert.equal(code, 0, 'Route smoke tests failed');
+    },
+  );
+  await check(
+    'header never renders a false signed-out CTA before hydration',
+    async () => {
+      const { html } = await page('/');
+      const header = html.match(/<header[\s\S]*?<\/header>/)?.[0] ?? '';
+      assert.match(
+        header,
+        /class="header-cta" aria-busy="true" href="\/account"/,
+      );
+      assert.doesNotMatch(header, /Sign in/);
+    },
+  );
+  await check(
     'populated catalog renders supported details and prices',
     async () => {
       const { html } = await page('/properties');
@@ -149,6 +173,44 @@ try {
     });
     try {
       const p = await browser.newPage();
+      await check(
+        'header updates after real form sign-in, navigation, reload and sign-out',
+        async () => {
+          await p.goto('http://localhost:3012/auth/sign-in');
+          await p.locator('.header-cta').getByText('Sign in').waitFor();
+          await p.getByLabel('Email address').fill('guest@example.test');
+          await p
+            .getByLabel('Password', { exact: true })
+            .fill('fixture-password');
+          await p.getByRole('button', { name: 'Welcome back' }).click();
+          await p.waitForURL('http://localhost:3012/account');
+          await p.locator('.header-cta').getByText('Account').waitFor();
+          for (const width of [1440, 390, 320]) {
+            await p.setViewportSize({ width, height: 1000 });
+            await p
+              .getByRole('navigation', { name: 'Main navigation' })
+              .getByRole('link', { name: 'Find a stay' })
+              .click();
+            await p.waitForURL('http://localhost:3012/properties');
+            assert.equal(
+              await p.locator('.header-cta').getAttribute('href'),
+              '/account',
+            );
+            assert.ok(
+              await p.evaluate(
+                () => document.documentElement.scrollWidth <= innerWidth,
+              ),
+            );
+            await p.reload();
+            await p.locator('.header-cta').getByText('Account').waitFor();
+            await p.locator('.header-cta').click();
+            await p.waitForURL('http://localhost:3012/account');
+          }
+          await p.getByRole('button', { name: 'Sign out' }).click();
+          await p.waitForURL('http://localhost:3012/');
+          await p.locator('.header-cta').getByText('Sign in').waitFor();
+        },
+      );
       await p.route('https://example.test/**', (route) =>
         route.fulfill({
           path: `${root}apps/web/public/fuhara-living.jpg`,
