@@ -1,0 +1,13 @@
+:root {
+  --teal: #0ea39a;
+  --teal-dark: #076d66;
+  --ink: #0b1f1e;
+  --forest: #092f2c;
+  --cream: #f8f7f2;
+  --muted: #516561;
+  --line: #dee5e0;
+  --radius: 18px;
+  --shadow: 0 16px 50px #0b1f1e0b;
+  --sans: Arial, Helvetica, sans-serif;
+  --serif: Georgia, 'Times New Roman', serif;
+}
