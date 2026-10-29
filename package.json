@@ -1,0 +1,46 @@
+{
+  "name": "fuhara-product",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @fuhara/web",
+    "build": "npm run build --workspace @fuhara/web",
+    "start": "npm run start --workspace @fuhara/web",
+    "typecheck": "npm run typecheck --workspace @fuhara/web",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "test:smoke": "node --test tests/smoke.mjs",
+    "test:catalog-routes": "node tests/catalog-routes.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test:phase3-database": "node --test tests/phase3-database.cjs",
+    "test:staging-public": "node tests/staging-public.cjs",
+    "test:phase4-database": "node --test tests/phase4-database.cjs",
+    "test:host-booking-database": "node --test tests/host-booking-database.cjs",
+    "test:phase5-database": "node --test tests/phase5-database.cjs",
+    "test:phase5-1-database": "node --test tests/phase5-1-database.cjs",
+    "test:phase5-2-database": "node --test tests/phase5-2-database.cjs",
+    "test:phase5-3-database": "node --test tests/phase5-2-database.cjs",
+    "test:phase5-4-database": "node --test tests/phase5-2-database.cjs",
+    "test:phase6-database": "node --test tests/phase6-database.cjs",
+    "test:favorites-database": "node --test tests/favorites-database.cjs",
+    "test:ux-remediation-database": "node --test tests/ux-remediation-database.cjs",
+    "mobile:start": "npm run start --workspace @fuhara/mobile",
+    "mobile:android": "npm run android --workspace @fuhara/mobile",
+    "mobile:lint": "npm run lint --workspace @fuhara/mobile",
+    "mobile:typecheck": "npm run typecheck --workspace @fuhara/mobile",
+    "mobile:test": "npm run test --workspace @fuhara/mobile",
+    "mobile:doctor": "npm run doctor --workspace @fuhara/mobile",
+    "mobile:export": "npm run export --workspace @fuhara/mobile"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
+  }
+}

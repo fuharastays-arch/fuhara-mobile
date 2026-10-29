@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Expo
+.expo/
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+.env.*.local
+
+# Keep safe templates
+!.env.example
+
+# Android signing
+.credentials/
+*.jks
+*.keystore
+keystore.properties
+
+# Keep example only
+!keystore.properties.example
+
+# Build output
+.gradle/
+build/
+dist/
+coverage/
+Pods/
+
+*.apk
+*.aab
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

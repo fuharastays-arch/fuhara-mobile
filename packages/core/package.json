@@ -1,0 +1,17 @@
+{
+  "name": "@fuhara/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./profile-workflow": "./src/profile-workflow.ts",
+    "./catalog": "./src/catalog.ts",
+    "./host": "./src/host.ts",
+    "./kyc": "./src/kyc.ts",
+    "./phone-otp": "./src/phone-otp.ts",
+    "./payments": "./src/payments.ts",
+    "./payouts": "./src/payouts.ts",
+    "./support": "./src/support.ts"
+  }
+}
